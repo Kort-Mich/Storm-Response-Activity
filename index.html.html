@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Power Outage Mystery | Crawford Electric Cooperative</title>
+<style>
+:root{--navy:#102e50;--blue:#205b82;--gold:#e3a72e;--ink:#182536;--muted:#64748b;--line:#d9e0e8;--paper:#fff;--wash:#f1f5f9}
+*{box-sizing:border-box}body{margin:0;background:#edf2f7;color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.wrap{max-width:900px;margin:0 auto;padding:22px 16px 48px}
+header{background:linear-gradient(130deg,var(--navy),var(--blue));color:#fff;border-radius:18px;padding:28px;margin-bottom:18px}
+.kicker{font-size:11px;letter-spacing:1.6px;font-weight:800;opacity:.8;text-transform:uppercase}
+h1{font-size:clamp(30px,6vw,48px);line-height:1.02;margin:12px 0}
+header p{max-width:650px;color:#e1edf7;margin:12px 0 0}
+.stats{display:flex;gap:30px;margin-top:22px;font-size:13px}.stats b{display:block;font-size:24px;color:#fff}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px;margin:14px 0;box-shadow:0 2px 8px #102e5009}
+.btn{border:0;border-radius:9px;padding:12px 18px;font-weight:750;background:var(--blue);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}.btn.alt{background:#fff;color:var(--blue);border:1px solid var(--line)}
+.btn.gold{background:var(--gold);color:#172536}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.between{justify-content:space-between}
+.small{font-size:13px;color:var(--muted)}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:800;color:var(--muted)}
+.progress{height:8px;border-radius:20px;background:#e4eaf0;overflow:hidden;margin:12px 0 18px}.progress>div{height:100%;width:0;background:var(--gold);transition:width .25s}
+h2{font-size:24px;line-height:1.2;margin:7px 0}h3{font-size:18px;margin:0 0 8px}
+.twist{border-left:5px solid var(--gold);background:#fff8e7;border-radius:8px;padding:14px;margin:14px 0}
+.options{display:grid;gap:10px;margin-top:14px}.option{display:flex;gap:12px;align-items:flex-start;width:100%;padding:14px;border:1px solid var(--line);border-radius:10px;background:#fff;text-align:left;color:var(--ink)}
+.option:hover{border-color:var(--blue);background:#f7fbff}.option.selected{border:2px solid var(--blue);background:#eff7fc}.letter{width:27px;height:27px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--wash);font-weight:800}
+.feedback{background:#eff7fc;border-left:5px solid var(--blue);padding:15px;border-radius:8px;margin-top:15px}
+.hidden{display:none!important}.department-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dept-tile{background:var(--wash);padding:13px;border-radius:9px;font-size:14px}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:20px}
+.editor details{border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0;background:#fff}
+.editor summary{font-weight:750;cursor:pointer}.field{display:grid;gap:5px;margin:10px 0}.field label{font-size:12px;font-weight:750;color:#475569}
+.field input,.field textarea{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:9px;color:var(--ink);background:#fff}
+.field textarea{min-height:70px;resize:vertical}.field .answer{min-height:55px}
+.notice{padding:12px;background:#fff8e7;border-radius:8px;font-size:13px}
+@media(max-width:560px){.wrap{padding:12px 10px 30px}header{padding:22px}.department-grid{grid-template-columns:1fr}.stats{gap:20px}.card{padding:16px}}
+@media print{body{background:#fff}.no-print{display:none!important}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div class="kicker" id="brand">Crawford Electric Cooperative • Career Fair Challenge</div>
+ <h1 id="mainTitle">THE POWER<br>OUTAGE MYSTERY</h1>
+ <p id="intro">A severe storm has rolled through town. Hundreds of members are without power. Your team must investigate the problem, coordinate a response and get the lights back on!</p>
+ <div class="stats"><div><b id="statDepts">8</b>Departments</div><div><b>4</b>Surprise twists</div><div><b>12</b>Minutes</div></div>
+</header>
+
+<section id="welcome" class="card">
+ <div class="eyebrow">Your mission</div><h2>Can your team restore the power?</h2>
+ <p>You're the emergency response team. At each stop, a different department faces a decision. Discuss the options as a group and choose your response. New problems will appear along the way.</p>
+ <div class="notice">Facilitator tip: Project this page for the class. Let students vote on each decision before you reveal the result.</div>
+ <div class="row" style="margin-top:16px"><button class="btn" id="startBtn">Start the mission →</button><button class="btn alt" id="editFromWelcome">Edit this activity</button></div>
+</section>
+
+<section id="game" class="card hidden">
+ <div class="row between"><div><div class="eyebrow" id="stepLabel">Department 1 of 8</div><h2 id="deptName"></h2></div><strong id="stepCount">0 / 8</strong></div>
+ <div class="progress"><div id="progressFill"></div></div>
+ <div class="eyebrow">Situation update</div><h3 id="sceneTitle"></h3><p id="sceneText"></p>
+ <div id="twistBox" class="twist hidden"><div class="eyebrow">🚨 New development</div><strong id="twistTitle"></strong><p id="twistText" style="margin:5px 0 0"></p></div>
+ <h3 id="question" style="margin-top:18px"></h3><p class="small">Discuss your options, then choose your team's response.</p>
+ <div class="options" id="options"></div>
+ <div id="feedback" class="feedback hidden"><div class="eyebrow">Decision explained</div><strong id="feedbackTitle"></strong><p id="feedbackText" style="margin:5px 0"></p><div class="small" id="careerLesson"></div></div>
+ <div class="row" style="margin-top:17px"><button class="btn" id="nextBtn" disabled>Choose an answer to continue</button><button class="btn alt" id="quitBtn">Start over</button></div>
+</section>
+
+<section id="results" class="card hidden">
+ <div style="text-align:center;padding:12px"><div style="font-size:42px">⚡🏆</div><div class="eyebrow">Mission complete</div><h2>YOU DID IT!</h2><p id="resultMessage"></p></div>
+ <div class="card" style="background:var(--wash);box-shadow:none"><div class="eyebrow">Your team's results</div><h2 id="score" style="font-size:34px"></h2><p class="small">Recommended responses selected</p></div>
+ <h3>What each department contributed</h3><div class="department-grid" id="recap"></div>
+ <div class="card" style="background:var(--wash);box-shadow:none;margin-top:18px"><h3>The big takeaway</h3><p>Restoring power takes an entire team. Line crews are essential, but so are the people answering calls, planning repairs, coordinating crews, managing technology, communicating with members and making business decisions.</p><strong>It takes all of us to keep the lights on!</strong></div>
+ <button class="btn" id="playAgain">Play again</button>
+</section>
+
+<section id="editor" class="card editor hidden">
+ <div class="row between"><div><div class="eyebrow">Customize your game</div><h2>Edit the activity</h2></div><button class="btn alt" id="closeEditor">Close</button></div>
+ <p class="small">Changes are saved in this browser. To move your edits to another computer or publish them, use Export website after saving.</p>
+ <div class="field"><label>Organization / event label</label><input id="editBrand"></div>
+ <div class="field"><label>Main introduction</label><textarea id="editIntro"></textarea></div>
+ <div id="departmentEditor"></div>
+ <div class="row" style="margin-top:16px"><button class="btn" id="saveEdits">Save changes</button><button class="btn alt" id="exportJson">Export editable content</button><button class="btn alt" id="exportHtml">Export website</button><label class="btn alt" for="importFile">Import content</label><input id="importFile" type="file" accept=".json,application/json" class="hidden"></div>
+ <p class="small" id="saveStatus" aria-live="polite"></p>
+ <div class="notice" style="margin-top:14px">Note: Browser-saved edits stay on this device. Use <b>Export website</b> to create an updated HTML file containing your changes before uploading it to your website host.</div>
+</section>
+<footer>Educational simulation. Actual outage procedures and responsibilities may vary. <span class="no-print"> • <button id="editFooter" style="text-decoration:underline">Edit activity</button></span></footer>
+</div>
+<script>
+const DEFAULT_DATA = {
+  "brand": "Crawford Electric Cooperative • Career Fair Challenge",
+  "intro": "A severe storm with strong winds, heavy rain and lightning has rolled through town. The outage map is lighting up and hundreds of members are without power. Your team must assess the damage, coordinate a response and get the lights back on!",
+  "departments": [
+    {
+      "dept": "Member Services",
+      "title": "The phones are ringing!",
+      "scene": "A severe thunderstorm has just passed through the service area. Members are calling to report outages. Some say their entire neighborhood is dark, while others report flickering lights.",
+      "question": "What should Member Services do first?",
+      "choices": [
+        {
+          "text": "Collect outage reports and record locations, affected members and safety concerns.",
+          "feedback": "YES! Reports are organized so the team can identify patterns and pass useful information along. Often times storms will leave behind downed power lines or other safety concerns. This is a great opportunity to remind members to stay away from downed lines or anything that has come in contact with power lines. ",
+          "lesson": "MSRs answer the phone, keep detailed records of member history, help members with their accounts, manage billing, take payments, start new services and create work orders. ",
+          "best": true
+        },
+        {
+          "text": "Tell everyone to wait a few hours before calling again.",
+          "feedback": "Try again! We care about our members; that's the cooperative advantage! If we dismiss their outage report, we may be left without important information, potential hazards could go unreported.",
+          "lesson": "MSRs answer the phone, keep detailed records of member history, help members with their accounts, manage billing, take payments, start new services and create work orders. ",
+          "best": false
+        },
+        {
+          "text": "Promise everyone their power will be back within an hour.",
+          "feedback": "Try again! The team has made a promise without information from operations to know the extent of the damage. It is never good to guess at restoration times. Everyone works together to get members the most up to date information we can provide. ",
+          "lesson": "MSRs answer the phone, keep detailed records of member history, help members with their accounts, manage billing, take payments, start new services and create work orders. ",
+          "best": false
+        }
+      ]
+    },
+    {
+      "dept": "Dispatch",
+      "title": "The outage reports are piling up.",
+      "scene": "Reports are coming in from three different parts of the service area. Dispatch notices that many calls seem to be coming from the same general area. Crews need to know where to start.",
+      "question": "What should Dispatch do?",
+      "choices": [
+        {
+          "text": "Panic, and call 911",
+          "feedback": "Try again! While large outages can be stressful, our dispatchers are trained to tackle almost any situation calmy and efficiently. We only contact emergency services when necessary, due to downed power lines crossing roads, fires, vehicle accidents, etc. ",
+          "lesson": "During outage restoration, dispatch monitors the outage map, assigns field crews work locations, records outage reasons, keeps the communication team and management updated and communicates with emergency services if needed. They also serve as a safety check with foremen in the field before they reenergize lines (closing a breaker) to make sure there are no other crews working in that area. ",
+          "best": false
+        },
+        {
+          "text": "Review outage reports and system information, identify priority areas and coordinate crew assignments.",
+          "feedback": "Yes! We follow a standard outage restoration process to restore power as quickly and fairly as possible. We prioritize outages affecting the most members first, then work our way down to smaller outages. This also helps us work from the main power lines outward. For example, a home at the end of a line may have a tree down, but even if we fix that damage, the home could still be without power because of a larger issue farther up the line. By fixing the larger issues first, we can restore power to more members at once and work more efficiently.",
+          "lesson": "During outage restoration, dispatch monitors the outage map, assigns field crews work locations, records outage reasons, keeps the communication team and management updated and communicates with emergency services if needed. They also serve as a safety check with foremen in the field before they reenergize lines (closing a breaker) to make sure there are no other crews working in that area. ",
+          "best": true
+        },
+        {
+          "text": "Only send crews to an outage location if 30 or more members have called in about it. ",
+          "feedback": "Our advanced meter technology often alerts us when members lose power, allowing us to begin assessing the situation right away. However, this technology doesn't catch every outage, so it's still important for members to report when they're without power. The sooner we know about an outage, the sooner we can respond!",
+          "lesson": "During outage restoration, dispatch monitors the outage map, assigns field crews work locations, records outage reasons, keeps the communication team and management updated and communicates with emergency services if needed. They also serve as a safety check with foremen in the field before they reenergize lines (closing a breaker) to make sure there are no other crews working in that area. ",
+          "best": false
+        }
+      ]
+    },
+    {
+      "dept": "Staking & Engineering",
+      "title": "Well that changes things! ",
+      "scene": "Heavy rain has caused creeks to flood, washing away some utility poles located along the creek banks. Our staking engineers must now assess the damage and determine new, safer locations for those poles.",
+      "question": "What should this department do?",
+      "choices": [
+        {
+          "text": "Review system maps, equipment information and field reports to help identify the affected section and repair needs. Make a site visit to the affected area to assess how the terrain has changed. ",
+          "feedback": "Flooding can change the landscape, washing away soil and making existing pole locations unsafe. By reviewing system information and visiting the site, staking engineers can assess the damage, identify what repairs are needed and determine the safest, most reliable locations for replacement poles.",
+          "lesson": "Staking engineers help design our electric system to be as safe and reliable as possible. They plan pole locations, power line routes and how lines are divided into sections to help limit outages. They also identify ways to improve our existing system and work with members to plan new electric services.",
+          "best": true
+        },
+        {
+          "text": "Replace the poles in their original location to get this task off your to-do list. ",
+          "feedback": "Try again! Replacing equipment without first identifying the problem and considering how future flooding could affect it could waste time and resources. We want to make repairs that are safe, reliable and built to last!",
+          "lesson": "Staking engineers help design our electric system to be as safe and reliable as possible. They plan pole locations, power line routes and how lines are divided into sections to help limit outages. They also identify ways to improve our existing system and work with members to plan new electric services.",
+          "best": false
+        },
+        {
+          "text": "Decide we should no longer set poles within 100 feet of a body of water and redesign the whole electric grid. ",
+          "feedback": "Try again! A long-term project won't solve an active outage. Plus, our service area has plenty of creeks, rivers, lakes and ponds. Avoiding them all wouldn't be practical and could leave some members without access to electricity. Providing reliable power to rural communities is what co-ops are all about!",
+          "lesson": "Staking engineers help design our electric system to be as safe and reliable as possible. They plan pole locations, power line routes and how lines are divided into sections to help limit outages. They also identify ways to improve our existing system and work with members to plan new electric services.",
+          "best": false
+        }
+      ]
+    },
+    {
+      "dept": "Operations / Line Crew",
+      "title": "The trouble spot is found!",
+      "scene": "A crew finds a large tree has fallen across a power line. The area is blocked, and the line may still be energized. A few residents are watching from nearby.",
+      "question": "What should the line crew do?",
+      "choices": [
+        {
+          "text": "Start moving the tree immediately to get the line clear.",
+          "feedback": "Try Again! This could expose workers and bystanders to a serious electrical hazard. ",
+          "lesson": "Line workers patrol the lines to find trouble areas that might be causing the outage. Once found, they work with their crew and dispatch to safely make repairs. This can include things like putting up fallen wire, fixing broken crossarms, exchanging transformers, you name it! ",
+          "best": false
+        },
+        {
+          "text": "Keep people away, secure the scene and follow established safety and de-energizing procedures before beginning repairs.",
+          "feedback": "YES! The crew prioritizes safety before attempting to restore power. ",
+          "lesson": "Line workers patrol the lines to find trouble areas that might be causing the outage. Once found, they work with their crew and dispatch to safely make repairs. This can include things like putting up fallen wire, fixing broken crossarms, exchanging transformers, you name it! ",
+          "best": true
+        },
+        {
+          "text": "Ask residents to help move branches away from the line.",
+          "feedback": "Try Again! Residents should never approach or handle downed power lines or trees/other obstacles in contact with power lines. Public safety is a critical part of outage response. ",
+          "lesson": "Line workers patrol the lines to find trouble areas that might be causing the outage. Once found, they work with their crew and dispatch to safely make repairs. This can include things like putting up fallen wire, fixing broken crossarms, exchanging transformers, you name it! ",
+          "best": false
+        }
+      ]
+    },
+    {
+      "dept": "IT",
+      "title": "The outage map is down!",
+      "scene": "Just as the team starts coordinating repairs, the outage reporting system becomes slow. Employees are having trouble accessing some information. The phones are still working.",
+      "question": "How should IT respond?",
+      "choices": [
+        {
+          "text": "Ignore it until the storm is over.",
+          "feedback": "Try Again! The system problem could make it harder for employees to coordinate and share information.",
+          "lesson": "IT supports the technology that helps the whole co-op operate.",
+          "best": false
+        },
+        {
+          "text": "Troubleshoot the system, communicate workarounds and help restore access while protecting important data.",
+          "feedback": "Yes! Employees have a plan to keep working while IT addresses the issue.",
+          "lesson": "IT supports the technology that helps the whole co-op operate. ",
+          "best": true
+        },
+        {
+          "text": "Turn off every computer in the building.",
+          "feedback": "Try Again! This could interrupt other systems and make the situation worse.",
+          "lesson": "IT supports the technology that helps the whole co-op operate.",
+          "best": false
+        }
+      ]
+    },
+    {
+      "dept": "Communications / Public Relations",
+      "title": "Your phone is dinging non-stop and rumors are spreading.",
+      "scene": "Members are posting on social media that the entire county will be without power until tomorrow. The co-op has not confirmed that information. Members want answers.",
+      "question": "What should Communications do?",
+      "choices": [
+        {
+          "text": "Post an update using confirmed information, explain what is being done, tell members where to find future updates and remind everyone to stay away from downed powerlines and crews while they work. ",
+          "feedback": "Yes! Members need to receive updates, and it is helpful to include safety reminders. You never want to make unsupported promises on restoration times. ",
+          "lesson": "The Communications and Public Relations team gathers updates from operations, dispatch and management to keep members informed during outages. During major outages, they may also work with local newspapers and radio stations to share updates and address concerns.\n\nBeyond outages, they develop communication plans throughout the year to keep members informed and engaged on topics like electrical safety, energy efficiency, the benefits of co-op membership, community events, director elections, the annual meeting and more!",
+          "best": true
+        },
+        {
+          "text": "Stay completely silent until every repair is finished.",
+          "feedback": "Try Again! Members may turn to rumors and unreliable sources for information. This could negatively affect the co-op's reputation and ruin trust between us and our members. ",
+          "lesson": "The Communications and Public Relations team gathers updates from operations, dispatch and management to keep members informed during outages. During major outages, they may also work with local newspapers and radio stations to share updates and address concerns.\n\nBeyond outages, they develop communication plans throughout the year to keep members informed and engaged on topics like electrical safety, energy efficiency, the benefits of co-op membership, community events, director elections, the annual meeting and more!",
+          "best": false
+        },
+        {
+          "text": "Post a cute picture of a dog reminding you to unplug your space heaters when you leave home. ",
+          "feedback": "Try again! Posting unrelated content during an outage can seem insensitive to members without power. It also clutters our feed, making important outage updates harder to find. Save the cute dog pictures for later and reschedule regular posts until restoration efforts are complete!",
+          "lesson": "The Communications and Public Relations team gathers updates from operations, dispatch and management to keep members informed during outages. During major outages, they may also work with local newspapers and radio stations to share updates and address concerns.\n\nBeyond outages, they develop communication plans throughout the year to keep members informed and engaged on topics like electrical safety, energy efficiency, the benefits of co-op membership, community events, director elections, the annual meeting and more!",
+          "best": false
+        }
+      ]
+    },
+    {
+      "dept": "Accounting / Purchasing",
+      "title": "The storm left a trail of destruction and we need supplies.",
+      "scene": "The crew identifies equipment and materials that are needed for repairs. The co-op must make sure the right supplies are available and expenses are handled properly.",
+      "question": "What should Accounting and Purchasing do?",
+      "choices": [
+        {
+          "text": "Check available inventory, coordinate approved purchases and track costs and records.",
+          "feedback": "Yes! The crew can get the needed materials while the co-op keeps track of spending to ensure we have the money to cover the costs.",
+          "lesson": "Warehouse, Purchasing and Accounting work together to keep materials stocked and costs tracked. Large outages can get expensive! Replacement equipment costs money, employees often work overtime and sometimes we need help from neighboring co-ops. If a storm causes enough damage, we may even qualify for government assistance through FEMA to help cover the cost of rebuilding our electric system. However, applying for this assistance takes a lot of work! Every expense must be carefully documented, from materials and employee hours to equipment and repair costs.",
+          "best": true
+        },
+        {
+          "text": "Tell crews to buy/take whatever they want without approval or records.",
+          "feedback": "Try Again! Untracked material use or purchasing can create confusion in the warehouse, slow down restoration and cause long-term financial problems.",
+          "lesson": "Warehouse, Purchasing and Accounting work together to keep materials stocked and costs tracked. Large outages can get expensive! Replacement equipment costs money, employees often work overtime and sometimes we need help from neighboring co-ops. If a storm causes enough damage, we may even qualify for government assistance through FEMA to help cover the cost of rebuilding our electric system. However, applying for this assistance takes a lot of work! Every expense must be carefully documented, from materials and employee hours to equipment and repair costs.",
+          "best": false
+        },
+        {
+          "text": "Wait until the next budget year to purchase anything.",
+          "feedback": "Try Again! Waiting would delay necessary repairs and leave many members without power. ",
+          "lesson": "Warehouse, Purchasing and Accounting work together to keep materials stocked and costs tracked. Large outages can get expensive! Replacement equipment costs money, employees often work overtime and sometimes we need help from neighboring co-ops. If a storm causes enough damage, we may even qualify for government assistance through FEMA to help cover the cost of rebuilding our electric system. However, applying for this assistance takes a lot of work! Every expense must be carefully documented, from materials and employee hours to equipment and repair costs.",
+          "best": false
+        }
+      ]
+    },
+    {
+      "dept": "Leadership / Management",
+      "title": "The final call.",
+      "scene": "Crews are making progress. More reports are coming in, members are asking for updates and employees are working hard. Management must help coordinate the overall response.",
+      "question": "What should leadership prioritize?",
+      "choices": [
+        {
+          "text": "Focus only on getting the lights back on as fast as possible, regardless of other concerns.",
+          "feedback": "Try Again! Speed matters, but safety, communication and resources cannot be ignored.",
+          "lesson": "Leadership helps develop our outage response plan by looking at the big picture. They consider factors like storm damage, weather forecasts, time of day, crew availability and whether additional help is needed. They also keep departments informed and working together to make sure restoration efforts are as safe and efficient as possible.",
+          "best": false
+        },
+        {
+          "text": "Support employees, prioritize safety, coordinate resources and keep departments working together.",
+          "feedback": "Yes! It is important for the response to stay coordinated and focused on restoring service quickly and safely.",
+          "lesson": "Leadership helps develop our outage response plan by looking at the big picture. They consider factors like storm damage, weather forecasts, time of day, crew availability and whether additional help is needed. They also keep departments informed and working together to make sure restoration efforts are as safe and efficient as possible.",
+          "best": true
+        },
+        {
+          "text": "Hide under your desk and take a nap. ",
+          "feedback": "Try Again! That sets a bad example, waists valuable time, and leaves employees and members without important information.",
+          "lesson": "Leadership helps develop our outage response plan by looking at the big picture. They consider factors like storm damage, weather forecasts, time of day, crew availability and whether additional help is needed. They also keep departments informed and working together to make sure restoration efforts are as safe and efficient as possible.",
+          "best": false
+        }
+      ]
+    }
+  ],
+  "twists": {
+    "1": {
+      "title": "The outage is bigger than expected!",
+      "text": "A second wave of calls comes in. A whole neighborhood is now without power. What looked like a small outage may involve a larger section of the electric system."
+    },
+    "3": {
+      "title": "A dangerous situation!",
+      "text": "A resident reports seeing sparks near the fallen tree. Children are also nearby. The area needs to be kept clear. Safety is now the top priority."
+    },
+    "5": {
+      "title": "Social media is heating up!",
+      "text": "A photo of the downed tree is spreading online. Someone claims the co-op knew about the problem before the storm. The team needs to respond with care and verified facts."
+    },
+    "7": {
+      "title": "One last challenge!",
+      "text": "Repairs are nearly complete, but the team still needs to confirm the system is safe to re-energize, coordinate restoration and let members know what to expect."
+    }
+  }
+};
+let data=structuredClone(DEFAULT_DATA),index=0,answers=[];
+const $=id=>document.getElementById(id);
+function loadSaved(){try{const saved=localStorage.getItem("pom-custom-content");if(saved)data=JSON.parse(saved)}catch(e){data=structuredClone(DEFAULT_DATA)}}
+function show(id){["welcome","game","results","editor"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
+function renderHeader(){$("brand").textContent=data.brand;$("intro").textContent=data.intro;$("statDepts").textContent=data.departments.length}
+function start(){index=0;answers=[];renderGame();show("game")}
+function renderGame(){
+ const d=data.departments[index],tw=data.twists[String(index)];
+ $("stepLabel").textContent=`Department ${index+1} of ${data.departments.length}`;
+ $("deptName").textContent=d.dept;$("stepCount").textContent=`${index} / ${data.departments.length}`;
+ $("progressFill").style.width=`${index/data.departments.length*100}%`;
+ $("sceneTitle").textContent=d.title;$("sceneText").textContent=d.scene;$("question").textContent=d.question;
+ $("twistBox").classList.toggle("hidden",!tw);
+ if(tw){$("twistTitle").textContent=tw.title;$("twistText").textContent=tw.text}
+ $("feedback").classList.add("hidden");$("nextBtn").disabled=true;$("nextBtn").textContent="Choose an answer to continue";
+ const box=$("options");box.replaceChildren();
+ d.choices.forEach((c,i)=>{const b=document.createElement("button");b.className="option";b.type="button";
+ const l=document.createElement("span");l.className="letter";l.textContent=String.fromCharCode(65+i);
+ const t=document.createElement("span");t.textContent=c.text;b.append(l,t);
+ b.addEventListener("click",()=>choose(i));box.append(b)});
+}
+function choose(i){
+ if(answers.length!==index)return;
+ answers[index]=i;const d=data.departments[index],c=d.choices[i];
+ [...$("options").children].forEach((b,j)=>{b.disabled=true;if(j===i)b.classList.add("selected")});
+ $("feedbackTitle").textContent=c.text;$("feedbackText").textContent=c.feedback;$("careerLesson").textContent="CAREER CONNECTION: "+c.lesson;
+ $("feedback").classList.remove("hidden");$("nextBtn").disabled=false;
+ $("nextBtn").textContent=index===data.departments.length-1?"See mission results →":"Next department →";
+}
+function finish(){
+ show("results");let score=0;const recap=$("recap");recap.replaceChildren();
+ data.departments.forEach((d,i)=>{const c=d.choices[answers[i]];if(c.best)score++;
+ const tile=document.createElement("div");tile.className="dept-tile";
+ const b=document.createElement("strong");b.textContent=d.dept;
+ const p=document.createElement("div");p.className="small";p.textContent=c.best?"✓ Recommended response":"Alternative response";
+ tile.append(b,p);recap.append(tile)});
+ $("score").textContent=`${score} / ${data.departments.length}`;
+ $("resultMessage").textContent=score===data.departments.length?"Excellent work! Your team made all the recommended decisions.":score>=Math.ceil(data.departments.length*.6)?"Nice work! Your team made several strong decisions.":"Your team made it through the storm! Every challenge is a chance to learn.";
+}
+function makeEditor(){
+ $("editBrand").value=data.brand;$("editIntro").value=data.intro;
+ const host=$("departmentEditor");host.replaceChildren();
+ data.departments.forEach((d,i)=>{
+ const details=document.createElement("details");if(i===0)details.open=true;
+ const summary=document.createElement("summary");summary.textContent=`${i+1}. ${d.dept}`;details.append(summary);
+ const fields=[["Department name","dept"],["Situation title","title"],["Situation description","scene"],["Question","question"]];
+ fields.forEach(([label,key])=>{const wrap=document.createElement("div");wrap.className="field";const lab=document.createElement("label");lab.textContent=label;const input=document.createElement(key==="scene"?"textarea":"input");input.value=d[key];input.dataset.dept=i;input.dataset.key=key;wrap.append(lab,input);details.append(wrap)});
+ d.choices.forEach((c,j)=>{const sub=document.createElement("h4");sub.textContent=`Answer ${String.fromCharCode(65+j)}`;sub.style.margin="15px 0 0";details.append(sub);
+ [["Answer text","text"],["Explanation","feedback"],["Career connection","lesson"]].forEach(([label,key])=>{const wrap=document.createElement("div");wrap.className="field";const lab=document.createElement("label");lab.textContent=label;const input=document.createElement("textarea");input.className="answer";input.value=c[key];input.dataset.dept=i;input.dataset.choice=j;input.dataset.key=key;wrap.append(lab,input);details.append(wrap)});
+ const bestWrap=document.createElement("div");bestWrap.className="field";const lab=document.createElement("label");lab.textContent="Recommended answer";const sel=document.createElement("select");sel.dataset.dept=i;sel.dataset.choice=j;sel.dataset.key="best";sel.innerHTML='<option value="false">No</option><option value="true">Yes</option>';sel.value=String(!!c.best);bestWrap.append(lab,sel);details.append(bestWrap)});
+ host.append(details);
+ });
+}
+function collectEditor(){
+ data.brand=$("editBrand").value;data.intro=$("editIntro").value;
+ document.querySelectorAll("#departmentEditor [data-key]").forEach(input=>{
+ const i=Number(input.dataset.dept),key=input.dataset.key;
+ if(input.dataset.choice!==undefined){const j=Number(input.dataset.choice);data.departments[i].choices[j][key]=key==="best"?input.value==="true":input.value}
+ else data.departments[i][key]=input.value;
+ });
+}
+function download(filename,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url)}
+function exportJson(){collectEditor();download("power-outage-mystery-content.json",JSON.stringify(data,null,2),"application/json")}
+function exportHtml(){
+ collectEditor();
+ let html=document.documentElement.outerHTML;
+ const marker="const DEFAULT_DATA = ";
+ const start=html.indexOf(marker)+marker.length;
+ const end=html.indexOf(";\nlet data=",start);
+ html=html.slice(0,start)+JSON.stringify(data,null,2)+html.slice(end);
+ download("power-outage-mystery.html","<!doctype html>\n"+html,"text/html");
+}
+$("startBtn").addEventListener("click",start);
+$("nextBtn").addEventListener("click",()=>{if(answers.length!==index+1)return;if(index===data.departments.length-1)finish();else{index++;renderGame()}});
+$("quitBtn").addEventListener("click",()=>{if(confirm("Start the activity over? Your current game progress will be lost."))show("welcome")});
+$("playAgain").addEventListener("click",start);
+function openEditor(){makeEditor();show("editor")}
+$("editFromWelcome").addEventListener("click",openEditor);$("editFooter").addEventListener("click",openEditor);
+$("closeEditor").addEventListener("click",()=>{renderHeader();show("welcome")});
+$("saveEdits").addEventListener("click",()=>{collectEditor();try{localStorage.setItem("pom-custom-content",JSON.stringify(data));$("saveStatus").textContent="Changes saved in this browser.";renderHeader()}catch(e){$("saveStatus").textContent="Could not save in this browser. Export your content instead."}});
+$("exportJson").addEventListener("click",exportJson);$("exportHtml").addEventListener("click",exportHtml);
+$("importFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const imported=JSON.parse(await f.text());if(!Array.isArray(imported.departments)||!imported.departments.length)throw Error("Invalid content file");data=imported;makeEditor();$("saveStatus").textContent="Content imported. Click Save changes to keep it in this browser."}catch(err){$("saveStatus").textContent="That file could not be imported. Please choose a valid exported content JSON file."}e.target.value=""});
+loadSaved();renderHeader();
+</script>
+</body>
+</html>
